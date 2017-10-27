@@ -2,10 +2,24 @@ package midterm;
 
 public class Mediator
 {
+	Client c;
+	ChatGui g;
 
-	public Mediator()
+	public Mediator(Client client, ChatGui gui)
 	{
-		// TODO Auto-generated constructor stub
+		c = client;
+		g = gui;
+
+	}
+
+	public void guiToClient(Object o)
+	{
+		c.writeToServer(o);
+	}
+
+	public void clientToGUI(String in)
+	{
+		g.addText(in);
 	}
 
 }

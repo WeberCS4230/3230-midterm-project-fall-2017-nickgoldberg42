@@ -11,14 +11,11 @@ import blackjack.message.MessageFactory;
 
 public class Client
 {
-	ChatGui chat;
 	ObjectOutputStream writer;
 
 	public Client(String ip, ChatGui cg)
 			throws UnknownHostException, IOException
 	{
-		chat = cg;
-
 		Socket socket = new Socket(ip, 8090);
 
 		new Thread(new Handler(socket)).start();
@@ -55,7 +52,8 @@ public class Client
 			{
 				try
 				{
-					addToChat(buffReader.readLine());
+					// addToChat(buffReader.readLine());
+					writeToServer("Hello");
 					writer.flush();
 				} catch (IOException e)
 				{
@@ -63,11 +61,6 @@ public class Client
 				}
 			}
 		}
-	}
-
-	public void addToChat(String in)
-	{
-		chat.addText(in);
 	}
 
 	public void writeToServer(Object o)

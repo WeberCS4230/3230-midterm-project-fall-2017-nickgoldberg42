@@ -3,7 +3,7 @@ package midterm;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
-public class blackjack
+public class Blackjack
 {
 
 	public static void main(String[] args)

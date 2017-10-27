@@ -1,6 +1,8 @@
 package midterm;
 
 import java.awt.Color;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -86,6 +88,19 @@ public class ChatGui
 
 		frame.getContentPane().add(panel);
 		panel.add(submitButton);
+
+		JButton btnNewButton = new JButton("HIT");
+		btnNewButton.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+			}
+		});
+		panel.add(btnNewButton);
+
+		JButton btnStay = new JButton("STAY");
+		panel.add(btnStay);
 		frame.setVisible(true);
 
 	}
