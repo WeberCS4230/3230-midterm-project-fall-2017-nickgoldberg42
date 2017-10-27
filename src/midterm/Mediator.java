@@ -9,7 +9,6 @@ public class Mediator
 	{
 		c = client;
 		g = gui;
-
 	}
 
 	public void guiToClient(Object o)

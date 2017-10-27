@@ -13,10 +13,9 @@ public class Client
 {
 	ObjectOutputStream writer;
 
-	public Client(String ip, ChatGui cg)
-			throws UnknownHostException, IOException
+	public Client(String ip) throws UnknownHostException, IOException
 	{
-		Socket socket = new Socket(ip, 8090);
+		Socket socket = new Socket(ip, 8989);
 
 		new Thread(new Handler(socket)).start();
 	}
@@ -52,7 +51,7 @@ public class Client
 			{
 				try
 				{
-					// addToChat(buffReader.readLine());
+					// need to send to chat with buffReader.readLine()
 					writeToServer("Hello");
 					writer.flush();
 				} catch (IOException e)

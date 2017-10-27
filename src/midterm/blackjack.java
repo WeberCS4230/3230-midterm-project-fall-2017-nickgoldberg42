@@ -15,7 +15,7 @@ public class Blackjack
 		{
 			@SuppressWarnings("unused")
 			Client chatClient = new Client(
-					"ec2-54-91-0-253.compute-1.amazonaws.com", cg);
+					"ec2-54-91-0-253.compute-1.amazonaws.com");
 		} catch (UnknownHostException e)
 		{
 			// TODO Auto-generated catch block
