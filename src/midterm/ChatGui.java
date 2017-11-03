@@ -21,6 +21,10 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import blackjack.game.Card;
+import blackjack.message.CardMessage;
+import blackjack.message.Message;
+import blackjack.message.Message.MessageType;
 import blackjack.message.MessageFactory;
 
 public class ChatGui
@@ -28,10 +32,9 @@ public class ChatGui
 	JTextArea textArea = new JTextArea();
 	JTextArea textEntry = new JTextArea();
 	private JFrame frame;
-
 	final Socket socket = new Socket(
 			"ec2-54-172-123-164.compute-1.amazonaws.com", 8989);
-	ObjectOutputStream writer = new ObjectOutputStream(
+	final ObjectOutputStream writer = new ObjectOutputStream(
 			socket.getOutputStream());
 
 	public ChatGui() throws UnknownHostException, IOException
@@ -42,7 +45,7 @@ public class ChatGui
 	public void initialize() throws UnknownHostException, IOException
 	{
 
-		Client client = new Client(socket);
+		Client client = new Client(socket, writer);
 
 		frame = new JFrame();
 		frame.setBounds(100, 100, 450, 300);
@@ -73,7 +76,8 @@ public class ChatGui
 					textArea.append(entry);
 					try
 					{
-						send(MessageFactory.getChatMessage(entry), socket);
+						send(MessageFactory.getChatMessage(entry), socket,
+								writer);
 					} catch (IOException e2)
 					{
 						e2.printStackTrace();
@@ -98,7 +102,7 @@ public class ChatGui
 				textArea.append(entry + "\n");
 				try
 				{
-					send(entry, socket);
+					send(MessageFactory.getChatMessage(entry), socket, writer);
 				} catch (IOException e2)
 				{
 					e2.printStackTrace();
@@ -124,7 +128,7 @@ public class ChatGui
 			{
 				try
 				{
-					send(MessageFactory.getStartMessage(), socket);
+					send(MessageFactory.getStartMessage(), socket, writer);
 				} catch (IOException e1)
 				{
 					e1.printStackTrace();
@@ -142,7 +146,7 @@ public class ChatGui
 			{
 				try
 				{
-					send(MessageFactory.getHitMessage(), socket);
+					send(MessageFactory.getHitMessage(), socket, writer);
 				} catch (IOException e1)
 				{
 					e1.printStackTrace();
@@ -162,7 +166,7 @@ public class ChatGui
 			{
 				try
 				{
-					send(MessageFactory.getStayMessage(), socket);
+					send(MessageFactory.getStayMessage(), socket, writer);
 				} catch (IOException e1)
 				{
 					e1.printStackTrace();
@@ -179,7 +183,8 @@ public class ChatGui
 
 	}
 
-	public void send(Object o, Socket socket) throws IOException
+	public void send(Object o, Socket socket, ObjectOutputStream writer)
+			throws IOException
 	{
 		writer.writeObject(o);
 		writer.flush();
@@ -188,14 +193,14 @@ public class ChatGui
 	public class Client
 	{
 
-		public Client(Socket socket) throws UnknownHostException, IOException
+		public Client(Socket socket, ObjectOutputStream writer)
+				throws UnknownHostException, IOException
 		{
 			new Thread(new Handler(socket)).start();
 		}
 
 		private class Handler implements Runnable
 		{
-			ObjectOutputStream writer;
 			Socket sock;
 			BufferedReader buffReader;
 			ObjectInputStream input;
@@ -206,7 +211,6 @@ public class ChatGui
 
 				buffReader = new BufferedReader(
 						new InputStreamReader(sock.getInputStream()));
-				writer = new ObjectOutputStream(sock.getOutputStream());
 				input = new ObjectInputStream(sock.getInputStream());
 
 			}
@@ -229,12 +233,19 @@ public class ChatGui
 					try
 					{
 						textArea.append(buffReader.readLine() + "\n");
-						Object x = input.readObject();
-						if (x.equals(MessageFactory.getJoinMessage()))
+						Message message = (Message) input.readObject();
+						if (message.getType() == MessageType.GAME_STATE)
 						{
 							writer.writeObject(MessageFactory.getJoinMessage());
 							writer.flush();
+						} else if (message.getType() == MessageType.CARD)
+						{
+							CardMessage cm = (CardMessage) input.readObject();
+							Card card = cm.getCard();
+							textArea.append(card.getSuite().toString()
+									+ card.getValue().toString());
 						}
+
 					} catch (IOException e)
 					{
 						e.printStackTrace();
