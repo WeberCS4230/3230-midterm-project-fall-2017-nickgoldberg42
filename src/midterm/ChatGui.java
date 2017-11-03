@@ -29,6 +29,11 @@ public class ChatGui
 	JTextArea textEntry = new JTextArea();
 	private JFrame frame;
 
+	final Socket socket = new Socket(
+			"ec2-54-172-123-164.compute-1.amazonaws.com", 8989);
+	ObjectOutputStream writer = new ObjectOutputStream(
+			socket.getOutputStream());
+
 	public ChatGui() throws UnknownHostException, IOException
 	{
 		initialize();
@@ -36,8 +41,7 @@ public class ChatGui
 
 	public void initialize() throws UnknownHostException, IOException
 	{
-		final Socket socket = new Socket(
-				"ec2-54-172-123-164.compute-1.amazonaws.com", 8989);
+
 		Client client = new Client(socket);
 
 		frame = new JFrame();
@@ -69,7 +73,7 @@ public class ChatGui
 					textArea.append(entry);
 					try
 					{
-						send(entry, socket);
+						send(MessageFactory.getChatMessage(entry), socket);
 					} catch (IOException e2)
 					{
 						e2.printStackTrace();
@@ -177,15 +181,12 @@ public class ChatGui
 
 	public void send(Object o, Socket socket) throws IOException
 	{
-		ObjectOutputStream writer = new ObjectOutputStream(
-				socket.getOutputStream());
 		writer.writeObject(o);
 		writer.flush();
 	}
 
 	public class Client
 	{
-		ObjectOutputStream writer;
 
 		public Client(Socket socket) throws UnknownHostException, IOException
 		{
@@ -194,6 +195,7 @@ public class ChatGui
 
 		private class Handler implements Runnable
 		{
+			ObjectOutputStream writer;
 			Socket sock;
 			BufferedReader buffReader;
 			ObjectInputStream input;
